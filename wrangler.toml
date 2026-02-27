@@ -1,0 +1,28 @@
+name = "hiu-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-18"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hiu-db"
+database_id = "4561a6c0-cab2-49f0-8ec2-cbf5410a6baa"
+migrations_dir = "drizzle/migrations"
+
+[[kv_namespaces]]
+binding = "hiu_kv"
+id = "8f44f9ec402d49b09505676132ca7db5"
+preview_id = "a4eb67b26197418ea811fa55db5ea67b"
+
+[[r2_buckets]]
+binding = "hiu_media"
+bucket_name = "hiu-media"
+preview_bucket_name = "hiu-media-preview"
+
+[vars]
+JWT_SECRET = "change-this-in-production"
+FRONTEND_URL = "https://hieumoi.online"
+RESEND_API_KEY = ""
+
+[dev]
+port = 8787
