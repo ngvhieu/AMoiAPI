@@ -12,6 +12,7 @@ import { feedRoutes } from "./routes/feed";
 import { searchRoutes } from "./routes/search";
 import { apiRateLimit } from "./middleware/rateLimit";
 import { AppError } from "./lib/errors";
+import { openApiSpec } from "./openapi";
 import type { Env } from "./lib/types";
 
 const app = new Hono<{ Bindings: Env }>();
@@ -41,6 +42,35 @@ app.route("/api/albums",    albumsRoutes);
 app.route("/api/playlists", playlistsRoutes);
 app.route("/api/feed",      feedRoutes);
 app.route("/api/search",    searchRoutes);
+
+// ─── Docs ─────────────────────────────────────────────────────────────────────
+
+app.get("/doc", (c) => c.json(openApiSpec));
+
+app.get("/ui", (c) =>
+  c.html(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hiu API Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+  <script>
+    SwaggerUIBundle({
+      url: "/doc",
+      dom_id: "#swagger-ui",
+      presets: [SwaggerUIBundle.presets.apis, SwaggerUIBundle.SwaggerUIStandalonePreset],
+      layout: "BaseLayout",
+      deepLinking: true,
+    });
+  </script>
+</body>
+</html>`)
+);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 
