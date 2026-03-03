@@ -4,7 +4,12 @@ export type Env = {
   hiu_media: R2Bucket;
   JWT_SECRET: string;
   FRONTEND_URL: string;
-  RESEND_API_KEY: string;
+  // SMTP
+  SMTP_HOST: string;
+  SMTP_PORT: string;       // "465" hoặc "587"
+  SMTP_USERNAME: string;
+  SMTP_PASSWORD: string;
+  SMTP_FROM: string;       // VD: "Hiu <noreply@hieumoi.online>"
 };
 
 export interface JWTPayload {

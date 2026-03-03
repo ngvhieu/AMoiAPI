@@ -14,7 +14,13 @@ export const authRoutes = new Hono<{ Bindings: Env }>();
 authRoutes.use("*", authRateLimit);
 
 function svc(c: any) {
-  return new AuthService(createDb(c.env.DB), c.env.JWT_SECRET, c.env.RESEND_API_KEY);
+  return new AuthService(createDb(c.env.DB), c.env.JWT_SECRET, {
+    host: c.env.SMTP_HOST,
+    port: Number(c.env.SMTP_PORT),
+    username: c.env.SMTP_USERNAME,
+    password: c.env.SMTP_PASSWORD,
+    from: c.env.SMTP_FROM,
+  });
 }
 
 authRoutes.post("/register", async (c) => {

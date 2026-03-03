@@ -1,4 +1,4 @@
-name = "hiu-api"
+name = "amoiapi"
 main = "src/index.ts"
 compatibility_date = "2024-12-18"
 compatibility_flags = ["nodejs_compat"]
@@ -22,7 +22,11 @@ preview_bucket_name = "hiu-media-preview"
 [vars]
 JWT_SECRET = "change-this-in-production"
 FRONTEND_URL = "https://hieumoi.online"
-RESEND_API_KEY = ""
+SMTP_HOST = "smtp.gmail.com"
+SMTP_PORT = "587"
+SMTP_USERNAME = "senselib2025@gmail.com"
+SMTP_PASSWORD = ""
+SMTP_FROM = "Hiu <senselib2025@gmail.com>"
 
 [dev]
 port = 8787

@@ -3,6 +3,8 @@ import { users, refreshTokens, otpCodes } from "../db/schema";
 import { hashPassword, verifyPassword, signJWT, verifyJWT, nanoid } from "../lib/jwt";
 import { ConflictError, UnauthorizedError, ForbiddenError, ValidationError } from "../lib/errors";
 import { sendOtpEmail, sendWelcomeEmail, sendPasswordChangedEmail } from "../lib/email";
+import type { SmtpConfig } from "../lib/smtp";
+
 import type { DB } from "../db";
 import type { RegisterInput, LoginInput } from "../validators/auth";
 
@@ -12,7 +14,7 @@ function generateOtp(): string {
 }
 
 export class AuthService {
-  constructor(private db: DB, private jwtSecret: string, private resendApiKey: string) {}
+  constructor(private db: DB, private jwtSecret: string, private smtp: SmtpConfig) {}
 
   async register(input: RegisterInput) {
     const existing = await this.db.query.users.findFirst({
@@ -86,7 +88,7 @@ export class AuthService {
     await this.#verifyOtp(user.id, email, code, "verify_email");
     await this.db.update(users).set({ isEmailVerified: true }).where(eq(users.id, user.id));
 
-    sendWelcomeEmail(this.resendApiKey, email, user.displayName ?? user.username).catch(console.error);
+    sendWelcomeEmail(this.smtp, email, user.displayName ?? user.username).catch(console.error);
 
     return {
       ...(await this.#issueTokens(user.id, user.username, user.isAdmin ?? false)),
@@ -150,7 +152,7 @@ export class AuthService {
     await this.db.delete(refreshTokens).where(eq(refreshTokens.userId, payload.sub));
 
     const user = await this.db.query.users.findFirst({ where: eq(users.id, payload.sub) });
-    if (user) sendPasswordChangedEmail(this.resendApiKey, user.email).catch(console.error);
+    if (user) sendPasswordChangedEmail(this.smtp, user.email).catch(console.error);
 
     return { message: "Mật khẩu đã được đặt lại thành công." };
   }
@@ -162,7 +164,7 @@ export class AuthService {
     const code = generateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
     await this.db.insert(otpCodes).values({ id: nanoid(), userId, email, code, type, expiresAt });
-    await sendOtpEmail(this.resendApiKey, email, code, type);
+    await sendOtpEmail(this.smtp, email, code, type);
   }
 
   async #verifyOtp(userId: string, email: string, code: string, type: "verify_email" | "reset_password") {
